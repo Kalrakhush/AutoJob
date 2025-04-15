@@ -6,6 +6,9 @@ backstory: >
   As an expert resume analyst with years of experience in HR and recruiting,
   I specialize in identifying key strengths and weaknesses in resumes to provide
   actionable feedback for improvement.
+llm:
+  provider: google
+  model: gemini-pro  
 tools:
   - ResumeParseTool
 verbose: true

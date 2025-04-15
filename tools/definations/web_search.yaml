@@ -1,0 +1,16 @@
+# web_search.yaml
+name: WebSearchTool
+description: Searches for job listings across multiple platforms
+input_schema:
+  type: object
+  properties:
+    query:
+      type: string
+      description: Search query for job listings
+    location:
+      type: string
+      description: Location for job search
+    experience_level:
+      type: string
+      description: Experience level (entry, mid, senior)
+  required: ["query"]

@@ -1,0 +1,25 @@
+from crewai import Task
+
+def resume_tasks(agents):
+    return {
+        'analyze_resume': Task(
+            description="Analyze the candidate's resume to identify strengths, weaknesses, and areas for improvement.",
+            expected_output="Summary of skills, experiences, and concrete suggestions for resume improvement.",
+            agent=agents['resume_analyzer']
+        ),
+        'search_jobs': Task(
+            description="Search for relevant job postings that match the candidate’s profile using skills and preferences.",
+            expected_output="A list of job postings with links, company names, titles, and brief descriptions.",
+            agent=agents['job_searcher']
+        ),
+        'improve_resume': Task(
+            description="Use the job descriptions found to improve and tailor the resume to align with the top match.",
+            expected_output="Revised resume with formatting, keyword optimization, and relevance to the job role.",
+            agent=agents['resume_improver']
+        ),
+        'apply_to_job': Task(
+            description="Submit the improved resume and required information to the selected job application portal.",
+            expected_output="Confirmation of application submission or details of the submission process followed.",
+            agent=agents['job_applicator']
+        )
+    }

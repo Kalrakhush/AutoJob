@@ -1,0 +1,19 @@
+# job_submission.yaml
+name: JobSubmissionTool
+description: Submits job applications to various platforms
+input_schema:
+  type: object
+  properties:
+    job_url:
+      type: string
+      description: URL of the job posting
+    resume_path:
+      type: string
+      description: Path to the tailored resume
+    cover_letter:
+      type: string
+      description: Optional cover letter text
+    user_info:
+      type: object
+      description: User's contact and personal information
+  required: ["job_url", "resume_path", "user_info"]

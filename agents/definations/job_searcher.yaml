@@ -6,6 +6,9 @@ backstory: >
   With extensive knowledge of job markets and search techniques, I excel at
   finding relevant job opportunities across various platforms and industries,
   filtering results to match candidate qualifications and preferences.
+llm:
+  provider: google
+  model: gemini-pro  
 tools:
   - WebSearchTool
 verbose: true

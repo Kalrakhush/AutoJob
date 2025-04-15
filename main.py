@@ -4,6 +4,7 @@ from agents.resume_analyzer import ResumeAnalyzerAgent
 from agents.job_searcher import JobSearcherAgent
 from agents.resume_improver import ResumeImproverAgent
 from agents.job_applicator import JobApplicatorAgent
+from tasks import tasks
 import os
 import argparse
 import json
@@ -12,19 +13,20 @@ class JobApplicationBot:
     def __init__(self):
         """Initialize the Job Application Bot."""
         # Create agents
-        self.resume_analyzer = ResumeAnalyzerAgent.create()
-        self.job_searcher = JobSearcherAgent.create()
-        self.resume_improver = ResumeImproverAgent.create()
-        self.job_applicator = JobApplicatorAgent.create()
-        
+        self.agents = {
+            'resume_analyzer': ResumeAnalyzerAgent.create(),
+            'job_searcher': JobSearcherAgent.create(),
+            'resume_improver': ResumeImproverAgent.create(),
+            'job_applicator': JobApplicatorAgent.create()
+        }
+
+        # Create tasks
+        self.tasks = tasks(self.agents)
+
         # Create the crew
         self.crew = Crew(
-            agents=[
-                self.resume_analyzer,
-                self.job_searcher,
-                self.resume_improver,
-                self.job_applicator
-            ],
+            agents=list(self.agents.values()),
+            tasks=list(self.tasks.values()),
             process=Process.sequential,
             verbose=True
         )
@@ -37,68 +39,50 @@ class JobApplicationBot:
             
         # 1. Analyze resume
         print(f"🔍 Analyzing resume: {resume_path}")
-        resume_task = self.crew.add_task(
-            task="Analyze the resume to extract skills, experiences, and education",
-            agent=self.resume_analyzer,
-            expected_output="Structured JSON with resume information",
-            output_file="data/user_data/parsed_resume.json",
-            context={
-                "resume_path": resume_path
-            }
-        )
+        # Inject context into tasks
+        self.tasks['analyze_resume'].context = {
+            "resume_path": resume_path
+        }
         
         # 2. Search for jobs
         print(f"🔎 Searching for jobs matching resume skills")
-        job_search_task = self.crew.add_task(
-            task="Find relevant job postings based on the resume",
-            agent=self.job_searcher,
-            expected_output="List of relevant job opportunities",
-            output_file="data/user_data/job_listings.json",
-            context={
-                "resume_data": "{resume_task.output}",
-                "job_keywords": job_keywords,
-                "location": location,
-                "experience_level": experience_level
-            }
-        )
+        self.tasks['search_jobs'].context = {
+            "resume_data": "{analyze_resume.output}",
+            "job_keywords": job_keywords,
+            "location": location,
+            "experience_level": experience_level
+        }
         
         # 3. Improve resume for each job
         print(f"✏️ Tailoring resume to match job descriptions")
-        resume_improvement_task = self.crew.add_task(
-            task="Improve the resume for each job opportunity",
-            agent=self.resume_improver,
-            expected_output="Improved resume versions for each job",
-            output_file="data/user_data/improved_resumes.json",
-            context={
-                "resume_data": "{resume_task.output}",
-                "job_listings": "{job_search_task.output}"
-            }
-        )
+        self.tasks['improve_resume'].context = {
+            "resume_data": "{analyze_resume.output}",
+            "job_listings": "{search_jobs.output}"
+        }
         
         # 4. Apply for jobs
         print(f"📤 Preparing job applications")
-        job_application_task = self.crew.add_task(
-            task="Apply for selected jobs with improved resumes",
-            agent=self.job_applicator,
-            expected_output="Application submission results",
-            output_file="data/user_data/application_results.json",
-            context={
-                "improved_resumes": "{resume_improvement_task.output}",
-                "job_listings": "{job_search_task.output}",
-                "user_info": user_info
-            }
-        )
+        self.tasks['apply_to_job'].context = {
+            "improved_resumes": "{improve_resume.output}",
+            "job_listings": "{search_jobs.output}",
+            "user_info": user_info
+        }
+        
+        # Create output directory
+        os.makedirs("data/user_data", exist_ok=True)
+        self.tasks['analyze_resume'].output_file = "data/user_data/parsed_resume.json"
+        self.tasks['search_jobs'].output_file = "data/user_data/job_listings.json"
+        self.tasks['improve_resume'].output_file = "data/user_data/improved_resumes.json"
+        self.tasks['apply_to_job'].output_file = "data/user_data/application_results.json"
         
         # Run the crew
         result = self.crew.run()
         
         return {
-            "resume_analysis": result[resume_task.id],
-            "job_search": result[job_search_task.id],
-            "resume_analysis": result[resume_task.id],
-            "job_search": result[job_search_task.id],
-            "resume_improvements": result[resume_improvement_task.id],
-            "job_applications": result[job_application_task.id]
+            "resume_analysis": result[self.tasks['analyze_resume'].id],
+            "job_search": result[self.tasks['search_jobs'].id],
+            "resume_improvements": result[self.tasks['improve_resume'].id],
+            "job_applications": result[self.tasks['apply_to_job'].id]
         }
 
 def main():
