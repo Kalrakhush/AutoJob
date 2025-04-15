@@ -1,0 +1,10 @@
+crewai>=0.28.0
+langchain>=0.0.267
+streamlit>=1.24.0
+beautifulsoup4>=4.12.2
+requests>=2.31.0
+pdfminer.six>=20221105
+python-docx>=0.8.11
+selenium>=4.11.2
+webdriver-manager>=4.0.0
+openai>=0.27.8
