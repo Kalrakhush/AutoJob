@@ -81,6 +81,7 @@ class LLMService:
         Reference: https://developers.google.com/generativeai
         """
         genai.configure(api_key=self.api_key)
+        self.model = genai.GenerativeModel("gemini-2.0-flash")
         # If the API offers additional endpoint settings, include them as needed.
 
     def generate_response(self, prompt):
@@ -89,12 +90,7 @@ class LLMService:
         Combines the system prompt with the user prompt.
         """
         full_prompt = f"{self.system_prompt}\n{prompt}"
-        response = genai.generate_text(
-            model=self.model,
-            prompt=full_prompt,
-            temperature=self.temperature,
-            max_output_tokens=self.max_tokens
-        )
+        response = self.model.generate_content(full_prompt)
         if response and response.result:
             return response.result
         else:
