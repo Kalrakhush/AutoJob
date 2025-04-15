@@ -1,9 +1,8 @@
-# resume_parser.py
 import os
 import json
 import PyPDF2
 from docx import Document
-from crewai import Tool
+from crewai import Tool, llm_inference  # assuming crewai provides an llm_inference method
 from pydantic import BaseModel, Field
 
 class ResumeParseInput(BaseModel):
@@ -13,7 +12,7 @@ class ResumeParseTool(Tool):
     def __init__(self):
         super().__init__(
             name="ResumeParseTool",
-            description="Extracts structured information from resume documents",
+            description="Extracts all information available from resume documents using an LLM without preset fields",
             input_schema=ResumeParseInput
         )
     
@@ -32,7 +31,7 @@ class ResumeParseTool(Tool):
             else:
                 return {"error": "Unsupported file format"}
             
-            # Process the content to extract structured information
+            # Use LLM to extract all possible information from the resume content.
             parsed_data = self._extract_information(content)
             return parsed_data
         except Exception as e:
@@ -44,7 +43,9 @@ class ResumeParseTool(Tool):
         with open(path, 'rb') as file:
             reader = PyPDF2.PdfReader(file)
             for page in reader.pages:
-                text += page.extract_text()
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
         return text
     
     def _parse_docx(self, path):
@@ -65,52 +66,33 @@ class ResumeParseTool(Tool):
             return json.load(file)
     
     def _extract_information(self, content):
-        """Extract structured information from text content."""
-        # Basic extraction logic - in production this would use NLP/ML
-        lines = content.strip().split('\n')
-        data = {
-            "raw_text": content,
-            "contact_info": {},
-            "education": [],
-            "experience": [],
-            "skills": []
-        }
+        """
+        Uses an LLM to extract all the available information from a resume.
+        The prompt instructs the LLM to analyze the resume text and return all details found in a JSON format,
+        without any hardcoded fields.
+        """
+        prompt = (
+            "Analyze the following resume text and extract every piece of information that is present. "
+            "Do not assume specific sections or hardcode keys—simply output everything you find in the text as a JSON object. "
+            "Your output should only be valid JSON. If certain details are repeated, structure them appropriately. "
+            "Resume Text:\n\n"
+            f"{content}\n\n"
+            "Return the extracted information as a JSON object."
+        )
         
-        # Simple extraction - would be replaced with more sophisticated parsing
-        sections = {'contact': [], 'education': [], 'experience': [], 'skills': []}
-        current_section = 'contact'
+        # Call the LLM; adjust parameters such as model, temperature, etc., as per your CrewAI configuration.
+        llm_response = llm_inference(prompt=prompt, model="default-model", temperature=0)
         
-        for line in lines:
-            line = line.strip()
-            if not line:
-                continue
-                
-            lower_line = line.lower()
-            if 'education' in lower_line and len(line) < 30:
-                current_section = 'education'
-                continue
-            elif any(x in lower_line for x in ['experience', 'employment', 'work']):
-                if len(line) < 30:
-                    current_section = 'experience'
-                    continue
-            elif any(x in lower_line for x in ['skills', 'technologies', 'competencies']):
-                if len(line) < 30:
-                    current_section = 'skills'
-                    continue
-                    
-            sections[current_section].append(line)
+        try:
+            # Assuming the LLM returns a valid JSON string.
+            result = json.loads(llm_response)
+        except json.JSONDecodeError:
+            # If the output isn't valid JSON, include the raw response for debugging purposes.
+            result = {"error": "LLM response was not valid JSON", "raw_response": llm_response}
         
-        # Extract email and phone
-        for line in sections['contact']:
-            if '@' in line:
-                data['contact_info']['email'] = line
-            elif any(c.isdigit() for c in line) and len(line) < 20:
-                data['contact_info']['phone'] = line
-                
-        # Process sections
-        data['education'] = sections['education']
-        data['experience'] = sections['experience']
-        data['skills'] = sections['skills']
-        
-        return data
+        return result
 
+# Example usage:
+# tool = ResumeParseTool()
+# result = tool.run(resume_path="path/to/resume.pdf")
+# print(result)

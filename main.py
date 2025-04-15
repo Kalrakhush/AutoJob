@@ -22,7 +22,7 @@ class JobApplicationBot:
 
         # Create tasks
         self.tasks = tasks(self.agents)
-
+        
         # Create the crew
         self.crew = Crew(
             agents=list(self.agents.values()),

@@ -1,6 +1,9 @@
 # job_searcher.py
 from crewai import Agent
-from tools.web_search import WebSearchTool
+from crewai_tools import BraveSearchTool
+
+# Initialize the tool
+brave_search_tool = BraveSearchTool()
 
 class JobSearcherAgent:
     @staticmethod
@@ -8,7 +11,7 @@ class JobSearcherAgent:
         """Create a JobSearcher agent from YAML definition."""
         agent = Agent.from_yaml(
             "agents/definitions/job_searcher.yaml",
-            tools=[WebSearchTool()]
+            tools=[brave_search_tool]
         )
         return agent
     

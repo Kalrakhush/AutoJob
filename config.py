@@ -1,9 +1,10 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 
 # API Keys
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "your-gemini-api-key")
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "your-openai-api-key")
 SERPAPI_API_KEY = os.environ.get("SERPAPI_API_KEY", "your-serpapi-api-key")
 
 # File paths
