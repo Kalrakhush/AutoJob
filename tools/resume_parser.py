@@ -1,25 +1,27 @@
+#tools/resume_parser.py
 import os
 import json
 import PyPDF2
 from docx import Document
-from crewai import Tool, llm_inference  # assuming crewai provides an llm_inference method
+from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
+from services.llm_service import LLMService
 
 class ResumeParseInput(BaseModel):
     resume_path: str = Field(description="Path to the resume file")
 
-class ResumeParseTool(Tool):
+class ResumeParseTool(BaseTool):
     def __init__(self):
         super().__init__(
             name="ResumeParseTool",
             description="Extracts all information available from resume documents using an LLM without preset fields",
             input_schema=ResumeParseInput
         )
-    
+        
+
     def _run(self, resume_path: str) -> dict:
-        """Extract information from a resume file."""
+        """Extract information from a resume file using LLM."""
         try:
-            # Extract content based on file extension
             if resume_path.endswith('.pdf'):
                 content = self._parse_pdf(resume_path)
             elif resume_path.endswith('.docx'):
@@ -31,14 +33,12 @@ class ResumeParseTool(Tool):
             else:
                 return {"error": "Unsupported file format"}
             
-            # Use LLM to extract all possible information from the resume content.
             parsed_data = self._extract_information(content)
             return parsed_data
         except Exception as e:
             return {"error": str(e)}
-    
+
     def _parse_pdf(self, path):
-        """Extract text from PDF."""
         text = ""
         with open(path, 'rb') as file:
             reader = PyPDF2.PdfReader(file)
@@ -47,30 +47,20 @@ class ResumeParseTool(Tool):
                 if page_text:
                     text += page_text + "\n"
         return text
-    
+
     def _parse_docx(self, path):
-        """Extract text from DOCX."""
         doc = Document(path)
-        text = "\n".join([para.text for para in doc.paragraphs])
-        return text
-    
+        return "\n".join([para.text for para in doc.paragraphs])
+
     def _parse_txt(self, path):
-        """Extract text from TXT."""
         with open(path, 'r', encoding='utf-8') as file:
-            text = file.read()
-        return text
-    
+            return file.read()
+
     def _parse_json(self, path):
-        """Extract data from JSON."""
         with open(path, 'r', encoding='utf-8') as file:
             return json.load(file)
-    
+
     def _extract_information(self, content):
-        """
-        Uses an LLM to extract all the available information from a resume.
-        The prompt instructs the LLM to analyze the resume text and return all details found in a JSON format,
-        without any hardcoded fields.
-        """
         prompt = (
             "Analyze the following resume text and extract every piece of information that is present. "
             "Do not assume specific sections or hardcode keys—simply output everything you find in the text as a JSON object. "
@@ -79,20 +69,19 @@ class ResumeParseTool(Tool):
             f"{content}\n\n"
             "Return the extracted information as a JSON object."
         )
-        
-        # Call the LLM; adjust parameters such as model, temperature, etc., as per your CrewAI configuration.
-        llm_response = llm_inference(prompt=prompt, model="default-model", temperature=0)
-        
+        llm = LLMService()
+        response_text = llm.generate_response(prompt)
         try:
-            # Assuming the LLM returns a valid JSON string.
-            result = json.loads(llm_response)
+            result = json.loads(response_text)
         except json.JSONDecodeError:
-            # If the output isn't valid JSON, include the raw response for debugging purposes.
-            result = {"error": "LLM response was not valid JSON", "raw_response": llm_response}
-        
+            result = {
+                "error": "LLM response was not valid JSON",
+                "raw_response": response_text
+            }
         return result
 
-# Example usage:
+
+# # Example usage:
 # tool = ResumeParseTool()
-# result = tool.run(resume_path="path/to/resume.pdf")
+# result = tool.run(resume_path=r"C:\Users\15038\Documents\Khushpreet's Resume.pdf")
 # print(result)

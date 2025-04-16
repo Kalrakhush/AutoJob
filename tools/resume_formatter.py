@@ -1,6 +1,6 @@
 # resume_formatter.py
 import json
-from crewai import Tool
+from crewai import tools
 from pydantic import BaseModel, Field
 from typing import Dict, Any
 
@@ -8,7 +8,7 @@ class ResumeFormatterInput(BaseModel):
     resume_data: Dict[str, Any] = Field(description="Parsed resume data")
     job_description: str = Field(description="Target job description")
 
-class ResumeFormatterTool(Tool):
+class ResumeFormatterTool(tools):
     def __init__(self):
         super().__init__(
             name="ResumeFormatterTool",

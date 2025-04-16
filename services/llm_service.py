@@ -91,10 +91,8 @@ class LLMService:
         """
         full_prompt = f"{self.system_prompt}\n{prompt}"
         response = self.model.generate_content(full_prompt)
-        if response and response.result:
-            return response.result
-        else:
-            return "No response generated."
+        generated_text = response.text.strip() if response.text else ""
+        return generated_text
 
     def initialize_embedding(self):
         """
@@ -136,10 +134,10 @@ class LLMService:
         """
         return self.embedding
 
-# Example usage:
-if __name__ == "__main__":
-    service = LLMService()
-    response = service.generate_response("What is the capital of France?")
-    print("LLM Response:", response)
-    embedding = service.get_embedding().embed("This is a sample sentence for generating embeddings.")
-    print("Embedding:", embedding)
+# # Example usage:
+# if __name__ == "__main__":
+#     service = LLMService()
+#     response = service.generate_response("What is the capital of France?")
+#     print("LLM Response:", response)
+#     embedding = service.get_embedding().embed("This is a sample sentence for generating embeddings.")
+#     print("Embedding:", embedding)
