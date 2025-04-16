@@ -1,5 +1,6 @@
 #tools/resume_parser.py
 import os
+import re
 import json
 import PyPDF2
 from docx import Document
@@ -61,27 +62,39 @@ class ResumeParseTool(BaseTool):
             return json.load(file)
 
     def _extract_information(self, content):
-        prompt = (
-            "Analyze the following resume text and extract every piece of information that is present. "
-            "Do not assume specific sections or hardcode keys—simply output everything you find in the text as a JSON object. "
-            "Your output should only be valid JSON. If certain details are repeated, structure them appropriately. "
-            "Resume Text:\n\n"
-            f"{content}\n\n"
-            "Return the extracted information as a JSON object."
-        )
-        llm = LLMService()
-        response_text = llm.generate_response(prompt)
         try:
-            result = json.loads(response_text)
-        except json.JSONDecodeError:
-            result = {
-                "error": "LLM response was not valid JSON",
-                "raw_response": response_text
+            prompt = (
+                "Analyze the following resume text and extract every piece of information that is present. "
+                "Do not assume specific sections or hardcode keys—simply output everything you find in the text as a JSON object. "
+                "Your output should only be valid JSON. If certain details are repeated, structure them appropriately. "
+                "Resume Text:\n\n"
+                f"{content}\n\n"
+                "Return the extracted information as a JSON object."
+            )
+            llm = LLMService()
+            llm_response = llm.generate_response(prompt)
+
+            # Clean the LLM response
+            cleaned_response = re.sub(r"^```(?:json)?\s*|\s*```$", "", llm_response.strip(), flags=re.DOTALL)
+
+            # Parse cleaned JSON response
+            response_data = json.loads(cleaned_response)
+
+            return {
+            "resume_data": response_data  # Corrected this line
             }
-        return result
 
 
-# # Example usage:
-# tool = ResumeParseTool()
-# result = tool.run(resume_path=r"C:\Users\15038\Documents\Khushpreet's Resume.pdf")
-# print(result)
+        except json.JSONDecodeError as e:
+            return {
+                "error": "LLM response was not valid JSON",
+                "raw_response": llm_response
+            }
+        except Exception as e:
+            return {"error": str(e)}
+
+
+# Example usage:
+tool = ResumeParseTool()
+result = tool.run(resume_path=r"C:\Users\15038\Documents\Khushpreet's Resume.pdf")
+print(result)
