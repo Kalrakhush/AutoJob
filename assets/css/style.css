@@ -1,0 +1,127 @@
+/* Global styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Main container */
+.main .block-container {
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+}
+
+/* Headers */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600 !important;
+}
+
+h1 {
+    font-size: 2.2rem !important;
+}
+
+h2 {
+    font-size: 1.8rem !important;
+    margin-top: 1.5rem !important;
+    margin-bottom: 1rem !important;
+}
+
+h3 {
+    font-size: 1.4rem !important;
+    margin-top: 1rem !important;
+    margin-bottom: 0.8rem !important;
+}
+
+/* Button styles */
+.stButton > button {
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.stButton > button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Card styles */
+.card {
+    border-radius: 8px;
+    border: 1px solid #eee;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Tabs styling */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 10px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    height: 40px;
+    white-space: normal;
+    background-color: #f8f9fa;
+    border-radius: 4px 4px 0 0;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: white !important;
+    border-bottom: 2px solid #4F8BF9 !important;
+}
+
+/* Sidebar styling */
+.css-1544g2n.e1fqkh3o4 {
+    padding-top: 2rem;
+}
+
+/* File uploader */
+.stFileUploader {
+    border-radius: 6px;
+    border: 1px dashed #ccc;
+    padding: 10px;
+}
+
+/* Progress bar */
+.stProgress > div > div {
+    height: 5px;
+    border-radius: 10px;
+}
+
+/* Expander */
+.streamlit-expanderHeader {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Info boxes */
+.stAlert {
+    border-radius: 6px;
+}
+
+/* Divider styling */
+hr {
+    margin: 2rem 0;
+    opacity: 0.2;
+}
+
+/* Mobile responsiveness */
+@media screen and (max-width: 768px) {
+    .main .block-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    h1 {
+        font-size: 1.8rem !important;
+    }
+    
+    h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    h3 {
+        font-size: 1.2rem !important;
+    }
+}

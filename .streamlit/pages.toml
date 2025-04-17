@@ -1,0 +1,10 @@
+[pages]
+# To hide a page, set enable to false
+"app.py" = {enable = false}
+"about.py" = {enable = false}
+"analyze_resume.py" = {enable = false}
+"home.py" = {enable = false}
+"improve_resume.py" = {enable = false}
+"init.py" = {enable = false}
+"search_jobs.py" = {enable = false}
+# Or add all files you want to hide

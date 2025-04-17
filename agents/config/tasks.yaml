@@ -1,0 +1,67 @@
+
+  analyze_resume:
+    description: >
+      Analyze the given resume thoroughly to extract all relevant information including:
+      personal details, education, work experience, skills, projects, and achievements.
+      Provide a comprehensive analysis of the resume's strengths and weaknesses.
+      Format the response as a structured JSON with clear sections.
+    expected_output: >
+      A detailed JSON analysis of the resume with the following sections:
+      - personal_info (name, email, phone, location)
+      - summary (brief career summary)
+      - skills (list of technical and soft skills)
+      - experience (list of work experiences with company, title, duration, and descriptions)
+      - education (list of educational qualifications)
+      - projects (list of relevant projects)
+      - strengths (what stands out in the resume)
+      - weaknesses (areas for improvement)
+      - assessment (overall assessment score and comments)
+    agent: ResumeAnalyzer
+    output_file: data/relevant_jobs.md
+    context: [analyze_resume]
+
+  search_jobs:
+    description: >
+      Search for job postings that match the candidate's profile based on the resume analysis.
+      Consider the candidate's skills, experience, education, and location preferences.
+      Focus on finding quality matches rather than quantity.
+      Search for jobs in the specified location or "Remote" if not specified.
+      Format the results as a structured JSON list of jobs.
+    expected_output: >
+      A JSON list of job postings with the following details for each job:
+      - title (job title)
+      - company (company name)
+      - location (job location)
+      - description (job description)
+      - requirements (list of requirements)
+      - salary (if available)
+      - posted_date (when the job was posted)
+      - application_link (link to apply)
+      - match_score (how well the candidate matches the job, from 0 to 1)
+    agent: JobSearcher
+
+  improve_resume:
+    description: >
+      Provide detailed suggestions to improve the resume based on:
+      1. The resume analysis
+      2. The job search results (if available)
+      3. Industry best practices and ATS optimization
+      Focus on actionable improvements for content, formatting, and keywords.
+      Provide specific examples of how to rewrite sections when appropriate.
+      Format the response as a structured JSON with clear improvement sections.
+    expected_output: >
+      A JSON with detailed improvement suggestions including:
+      - summary (overview of recommendations)
+      - improvement_areas (list of key areas to improve)
+      - summary_suggestions (improvements for the summary section)
+      - skills_suggestions (improvements for the skills section)
+      - experience_suggestions (improvements for the experience section)
+      - education_suggestions (improvements for the education section)
+      - formatting_suggestions (improvements for resume formatting)
+      - keyword_suggestions (keywords to add based on target jobs)
+      - improved_summary (rewritten summary example)
+      - improved_skills (rewritten skills example)
+      - improved_experience (example of improved experience descriptions)
+    agent: ResumeImprover
+    context: [analyze_resume, search_jobs]
+    output_file: "data/imporved_resume.md"

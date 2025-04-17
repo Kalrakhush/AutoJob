@@ -1,154 +1,75 @@
-# Job Application Agent
+# CareerBoost AI - Job Application Assistant
 
-A CrewAI-powered automated job application system that analyzes resumes, searches for matching jobs, improves resumes for specific positions, and handles job applications.
+CareerBoost AI is an advanced job application assistant that uses artificial intelligence to help job seekers optimize their resumes and find relevant job opportunities. The application leverages CrewAI to orchestrate multiple specialized AI agents that work together to provide comprehensive assistance in the job application process.
 
 ## Features
 
-- **Resume Analysis**: Parse and extract structured information from resume documents
-- **Job Search**: Find relevant job postings based on skills and preferences
-- **Resume Tailoring**: Optimize resumes for specific job descriptions
-- **Application Submission**: Automate the job application process
-- **User-Friendly UI**: Streamlit-based interface for easy interaction
-
-## Project Structure
-
-```
-job_application_agent/
-│
-├── main.py                # Entry point for the application
-├── config.py              # Configuration settings
-├── requirements.txt       # Dependencies
-├── README.md              # Project documentation
-│
-├── agents/
-│   ├── __init__.py
-│   ├── definitions/       # YAML definitions for agents
-│   │   ├── resume_analyzer.yaml
-│   │   ├── job_searcher.yaml
-│   │   ├── resume_improver.yaml
-│   │   └── job_applicator.yaml
-│   ├── resume_analyzer.py # Agent implementation
-│   ├── job_searcher.py    # Agent implementation
-│   ├── resume_improver.py # Agent implementation
-│   └── job_applicator.py  # Agent implementation
-│
-├── tools/
-│   ├── __init__.py
-│   ├── definitions/       # YAML definitions for tools
-│   │   ├── resume_parser.yaml
-│   │   ├── web_search.yaml
-│   │   ├── resume_formatter.yaml
-│   │   └── job_submission.yaml
-│   ├── resume_parser.py   # Tool implementation
-│   ├── web_search.py      # Tool implementation
-│   ├── resume_formatter.py # Tool implementation
-│   └── job_submission.py  # Tool implementation
-│
-├── ui/
-│   ├── __init__.py
-│   ├── app.py             # Streamlit application
-│   └── components/
-│       ├── __init__.py
-│       ├── resume_upload.py
-│       ├── job_selector.py
-│       └── confirmation.py
-│
-└── data/
-    └── user_data/         # Directory to store user resumes and job info
-```
+- **Resume Analysis**: Upload your resume and get a detailed analysis of your skills, experience, and qualifications.
+- **Job Search**: Find job openings that match your profile based on your resume analysis.
+- **Resume Improvement**: Get personalized suggestions to improve your resume based on the target job positions.
+- **Modern UI**: User-friendly interface built with Streamlit for a seamless experience.
 
 ## Installation
 
-1. Clone the repository:
+1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/job-application-agent.git
-cd job-application-agent
+git clone https://github.com/yourusername/careerboost-ai.git
+cd careerboost-ai
 ```
 
-2. Install dependencies:
+2. Install the required dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
+3. Create a `.env` file with your API keys:
+```
+GEMINI_API_KEY=your_gemini_api_key
+SERPER_API_KEY=your_serper_api_key
+TAVILY_API_KEY=your_tavily_api_key
+```
+
 ## Usage
 
-### Command Line Interface
-
-Run the application from the command line:
-
+1. Run the Streamlit app:
 ```bash
-python main.py --resume path/to/resume.pdf --keywords "python developer" --location "San Francisco" --experience senior --user-info path/to/user_info.json
+streamlit run app.py
 ```
 
-Arguments:
-- `--resume`: Path to your resume file (required)
-- `--keywords`: Job keywords to search for
-- `--location`: Job location preference
-- `--experience`: Experience level (entry, mid, senior)
-- `--user-info`: Path to JSON file with user information
+2. Open your browser and navigate to the URL displayed in the terminal (usually http://localhost:8501).
 
-Example user_info.json:
-```json
-{
-    "name": "John Doe",
-    "email": "john@example.com",
-    "phone": "123-456-7890",
-    "location": "San Francisco, CA",
-    "linkedin": "https://linkedin.com/in/johndoe"
-}
+3. Follow the app's interface to:
+   - Upload your resume
+   - Get a detailed analysis
+   - Search for matching jobs
+   - Receive personalized improvement suggestions
+
+## Project Structure
+
+```
+job_application_assistant/
+├── app.py                    # Main entry point for the Streamlit application
+├── config/                   # Configuration settings
+├── assets/                   # Static assets (CSS, images, JS)
+├── components/               # Reusable UI components
+├── pages/                    # Application pages
+├── utils/                    # Utility functions
+├── services/                 # Business logic services
+├── agents/                   # CrewAI agents and configurations
+└── tools/                    # Tools used by the agents
 ```
 
-### Web Interface
+## Technologies Used
 
-Start the Streamlit web interface:
+- **Streamlit**: For building the user interface
+- **CrewAI**: For orchestrating AI agents
+- **Google Gemini**: For natural language processing
+- **Several search APIs**: For finding job opportunities
 
-```bash
-streamlit run ui/app.py
-```
+## Contributing
 
-Then follow the steps in the web interface:
-1. Upload your resume
-2. Search for jobs
-3. Improve your resume for selected jobs
-4. Submit applications
-
-## How It Works
-
-The application uses CrewAI to orchestrate a team of agents:
-
-1. **Resume Analyzer Agent**: Parses your resume to extract skills, experiences, and qualifications.
-2. **Job Searcher Agent**: Finds job postings that match your skills and preferences.
-3. **Resume Improver Agent**: Tailors your resume to better match each job description.
-4. **Job Applicator Agent**: Submits applications to the selected jobs.
-
-Each agent uses specialized tools to perform its tasks, and the agents work together in a sequential process to complete the job application workflow.
-
-## Configuration
-
-You can customize the application behavior by modifying the YAML definition files for agents and tools:
-
-- Agent definitions: `agents/definitions/*.yaml`
-- Tool definitions: `tools/definitions/*.yaml`
-
-## Extension Points
-
-To extend the system with additional functionality:
-
-1. Add new tools in the `tools/` directory
-2. Create YAML definitions for new tools in `tools/definitions/`
-3. Implement new agents in the `agents/` directory
-4. Create YAML definitions for new agents in `agents/definitions/`
-5. Update the main application to incorporate the new components
-
-## Dependencies
-
-- crewai: Agent orchestration framework
-- streamlit: Web interface
-- PyPDF2: PDF parsing
-- python-docx: DOCX parsing
-- requests: HTTP requests for job searching and applications
-- pydantic: Data validation and schema definitions
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT
+This project is licensed under the MIT License - see the LICENSE file for details.

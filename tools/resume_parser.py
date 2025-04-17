@@ -1,4 +1,3 @@
-#tools/resume_parser.py
 import os
 import re
 import json
@@ -15,31 +14,38 @@ class ResumeParseTool(BaseTool):
     def __init__(self):
         super().__init__(
             name="ResumeParseTool",
-            description="Extracts all information available from resume documents using an LLM without preset fields",
+            description="Extracts structured information from a resume file using LLM",
             input_schema=ResumeParseInput
         )
-        
 
-    def _run(self, resume_path: str) -> dict:
-        """Extract information from a resume file using LLM."""
+    def _run(self, tool_input: dict) -> dict:
+        resume_path = tool_input.get("resume_path")
+        if not resume_path or not os.path.exists(resume_path):
+            return {"error": f"Invalid or missing file: {resume_path}"}
+        return self._extract_from_resume(resume_path)
+
+    def _extract_from_resume(self, resume_path: str) -> dict:
         try:
-            if resume_path.endswith('.pdf'):
-                content = self._parse_pdf(resume_path)
-            elif resume_path.endswith('.docx'):
-                content = self._parse_docx(resume_path)
-            elif resume_path.endswith('.txt'):
-                content = self._parse_txt(resume_path)
-            elif resume_path.endswith('.json'):
-                content = self._parse_json(resume_path)
-            else:
-                return {"error": "Unsupported file format"}
-            
-            parsed_data = self._extract_information(content)
-            return parsed_data
+            content = self._read_resume_file(resume_path)
+            return self._extract_information(content)
         except Exception as e:
             return {"error": str(e)}
+    
+    def _read_resume_file(self, path):
+        ext = path.lower().split('.')[-1]
+        if ext == 'pdf':
+            return self._parse_pdf(path)
+        elif ext == 'docx':
+            return self._parse_docx(path)
+        elif ext == 'txt':
+            return self._parse_txt(path)
+        elif ext == 'json':
+            return self._parse_json(path)
+        else:
+            raise ValueError("Unsupported file type")
 
     def _parse_pdf(self, path):
+        import PyPDF2
         text = ""
         with open(path, 'rb') as file:
             reader = PyPDF2.PdfReader(file)
@@ -50,6 +56,7 @@ class ResumeParseTool(BaseTool):
         return text
 
     def _parse_docx(self, path):
+        from docx import Document
         doc = Document(path)
         return "\n".join([para.text for para in doc.paragraphs])
 
@@ -59,42 +66,16 @@ class ResumeParseTool(BaseTool):
 
     def _parse_json(self, path):
         with open(path, 'r', encoding='utf-8') as file:
-            return json.load(file)
+            return json.dumps(json.load(file), indent=2)
 
     def _extract_information(self, content):
-        try:
-            prompt = (
-                "Analyze the following resume text and extract every piece of information that is present. "
-                "Do not assume specific sections or hardcode keys—simply output everything you find in the text as a JSON object. "
-                "Your output should only be valid JSON. If certain details are repeated, structure them appropriately. "
-                "Resume Text:\n\n"
-                f"{content}\n\n"
-                "Return the extracted information as a JSON object."
-            )
-            llm = LLMService()
-            llm_response = llm.generate_response(prompt)
-
-            # Clean the LLM response
-            cleaned_response = re.sub(r"^```(?:json)?\s*|\s*```$", "", llm_response.strip(), flags=re.DOTALL)
-
-            # Parse cleaned JSON response
-            response_data = json.loads(cleaned_response)
-
-            return {
-            "resume_data": response_data  # Corrected this line
-            }
-
-
-        except json.JSONDecodeError as e:
-            return {
-                "error": "LLM response was not valid JSON",
-                "raw_response": llm_response
-            }
-        except Exception as e:
-            return {"error": str(e)}
-
-
-# Example usage:
-tool = ResumeParseTool()
-result = tool.run(resume_path=r"C:\Users\15038\Documents\Khushpreet's Resume.pdf")
-print(result)
+        from services.llm_service import LLMService
+        prompt = (
+            "Analyze the following resume and extract all possible details as proper string eith proper line breaks. "
+            "understand the text first of resume , as it can be of any format. Then give proper headers as are in resume and proper details.\n\n"
+            f"{content}\n\n"
+            
+        )
+        llm = LLMService()
+        response = llm.generate_response(prompt)
+        return response
