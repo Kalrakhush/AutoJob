@@ -3,6 +3,9 @@ import json
 from agents.job_application_crew import jobApplicationCrew
 from crewai import Crew, Process
 from services.llm_service import LLMService
+import re
+import traceback
+import ast
 
 llm = LLMService()
 
@@ -22,7 +25,7 @@ def execute_resume_analysis(resume_data):
         
         # Create the crew with just the resume analyzer agent and task
         crew = Crew(
-            agents=[crew_base.resume_analyzer()],
+            agents=[crew_base.ResumeAnalyzer()],
             tasks=[crew_base.analyze_resume()],
             verbose=True,
             process=Process.sequential,
@@ -39,31 +42,18 @@ def execute_resume_analysis(resume_data):
     except Exception as e:
         return f"Error analyzing resume: {str(e)}"
 
+
 def execute_job_search(resume_data, job_title="", location="Remote"):
-    """
-    Execute the job search task.
-    
-    Args:
-        resume_data (str): Resume data as string
-        job_title (str): Job title or keywords
-        location (str): Job location
-        
-    Returns:
-        list: Results of the job search
-    """
     try:
-        # Initialize the crew
         crew_base = jobApplicationCrew()
-        
-        # Create the crew with just the job searcher agent and task
+
         crew = Crew(
-            agents=[crew_base.job_searcher()],
+            agents=[crew_base.JobSearcher()],
             tasks=[crew_base.search_jobs()],
             verbose=True,
             process=Process.sequential,
         )
-        
-        # Execute the task
+
         result = crew.kickoff(
             inputs={
                 "resume": str(resume_data),
@@ -71,14 +61,22 @@ def execute_job_search(resume_data, job_title="", location="Remote"):
                 "location": location
             }
         )
-        
-        # Try to parse the result as JSON
+
+        output_text = str(result.output) if hasattr(result, "output") else str(result)
+        cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", output_text.strip(), flags=re.DOTALL)
+
+        print("Raw cleaned output:", repr(cleaned))  # 🔍 Check what's wrong
+
+        # First try JSON
         try:
-            return json.loads(result)
-        except:
-            return result
+            return json.loads(cleaned)
+        except json.JSONDecodeError:
+            # Then fallback to Python dict-style strings
+            return ast.literal_eval(cleaned)
+
     except Exception as e:
-        return f"Error searching jobs: {str(e)}"
+        full_traceback = traceback.format_exc()  # 👈 Full error with stack trace
+        print("🚨 Full Error Traceback:\n", full_traceback)  # For terminal/log
 
 def execute_resume_improvement(resume_data, job_results=None, job_title="", location=""):
     """
@@ -99,7 +97,7 @@ def execute_resume_improvement(resume_data, job_results=None, job_title="", loca
         
         # Create the crew with just the resume improver agent and task
         crew = Crew(
-            agents=[crew_base.resume_improver()],
+            agents=[crew_base.ResumeImprover()],
             tasks=[crew_base.improve_resume()],
             verbose=True,
             process=Process.sequential,
@@ -119,10 +117,18 @@ def execute_resume_improvement(resume_data, job_results=None, job_title="", loca
         # Execute the task
         result = crew.kickoff(inputs=inputs)
         
-        # Try to parse the result as JSON
+        output_text = str(result.output) if hasattr(result, "output") else str(result)
+        cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", output_text.strip(), flags=re.DOTALL)
+
+        print("Raw cleaned output:", repr(cleaned))  # 🔍 Check what's wrong
+
+        # First try JSON
         try:
-            return json.loads(result)
-        except:
-            return result
+            return json.loads(cleaned)
+        except json.JSONDecodeError:
+            # Then fallback to Python dict-style strings
+            return ast.literal_eval(cleaned)
+
     except Exception as e:
-        return f"Error improving resume: {str(e)}"
+        full_traceback = traceback.format_exc()  # 👈 Full error with stack trace
+        print("🚨 Full Error Traceback:\n", full_traceback)  # For terminal/log

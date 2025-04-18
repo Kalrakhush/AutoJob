@@ -43,44 +43,42 @@ def render_improvement_results():
     """Render the resume improvement results."""
     if "improved_resume" not in st.session_state or not st.session_state.improved_resume:
         return
-    
+
     improvements = st.session_state.improved_resume
-    
+    print(f"[DEBUG] improvements type: {type(improvements)}")
+
+    # ✅ Always unwrap CrewOutput if present
+    if hasattr(improvements, 'output'):
+        improvements = improvements.output
+
     st.markdown("### Resume Improvement Suggestions")
-    
-    # Try to parse improvements if it's a string
+
+    # ✅ Try to parse if it's a JSON string
     if isinstance(improvements, str):
         try:
             improvements = json.loads(improvements)
-        except:
-            # If not valid JSON, display as is in tabs
+        except json.JSONDecodeError:
             tab1, tab2 = st.tabs(["Suggestions", "Raw Output"])
-            
             with tab1:
                 st.markdown(improvements)
-            
             with tab2:
                 st.code(improvements)
             return
-    
-    # Display improvements in a structured way
+
+    # ✅ Structured display
     if isinstance(improvements, dict):
         tab1, tab2, tab3 = st.tabs(["Summary", "Detailed Suggestions", "Improved Content"])
-        
+
         with tab1:
             st.markdown("#### Summary of Improvements")
             st.markdown(improvements.get('summary', 'No summary available'))
-            
-            # Display key improvement areas
             if 'improvement_areas' in improvements:
                 st.markdown("#### Key Improvement Areas")
                 for area in improvements['improvement_areas']:
                     st.markdown(f"- {area}")
-        
+
         with tab2:
             st.markdown("#### Detailed Suggestions")
-            
-            # Display section-specific suggestions
             sections = ['summary', 'skills', 'experience', 'education', 'formatting']
             for section in sections:
                 section_key = f'{section}_suggestions'
@@ -91,18 +89,15 @@ def render_improvement_results():
                                 st.markdown(f"- {suggestion}")
                         else:
                             st.markdown(improvements[section_key])
-        
+
         with tab3:
             st.markdown("#### Improved Content")
-            
-            # Display improved content sections
             sections = ['improved_summary', 'improved_skills', 'improved_experience', 'improved_education']
             for section in sections:
                 if section in improvements:
                     with st.expander(f"{section.replace('improved_', '').capitalize()}"):
                         st.markdown(improvements[section])
-            
-            # Option to download improved resume
+
             if 'improved_resume_full' in improvements:
                 st.download_button(
                     label="Download Improved Resume",
@@ -110,6 +105,27 @@ def render_improvement_results():
                     file_name="improved_resume.md",
                     mime="text/markdown"
                 )
-    else:
-        # If format is unknown, display as is
-        st.markdown(str(improvements))
+
+        # ✅ Optional Markdown download of all dict content
+        def dict_to_markdown(data, level=2):
+            md = ""
+            for key, value in data.items():
+                header = f"{'#' * level} {key.replace('_', ' ').capitalize()}\n\n"
+                if isinstance(value, dict):
+                    md += header + dict_to_markdown(value, level + 1)
+                elif isinstance(value, list):
+                    md += header + "\n".join([f"- {str(item)}" for item in value]) + "\n\n"
+                else:
+                    md += header + f"{value}\n\n"
+            return md
+
+        markdown_output = dict_to_markdown(improvements)
+        st.download_button(
+            label="Download All as Markdown",
+            data=markdown_output,
+            file_name="resume_improvements_full.md",
+            mime="text/markdown"
+        )
+
+    # else:
+    #     st.markdown(str(improvements))

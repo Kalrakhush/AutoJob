@@ -1,4 +1,3 @@
-
   analyze_resume:
     description: >
       Analyze the given resume thoroughly to extract all relevant information including:
@@ -17,9 +16,7 @@
       - weaknesses (areas for improvement)
       - assessment (overall assessment score and comments)
     agent: ResumeAnalyzer
-    output_file: data/relevant_jobs.md
-    context: [analyze_resume]
-
+    
   search_jobs:
     description: >
       Search for job postings that match the candidate's profile based on the resume analysis.
@@ -27,18 +24,17 @@
       Focus on finding quality matches rather than quantity.
       Search for jobs in the specified location or "Remote" if not specified.
       Format the results as a structured JSON list of jobs.
+      This is the resume: {resume}
     expected_output: >
       A JSON list of job postings with the following details for each job:
-      - title (job title)
-      - company (company name)
-      - location (job location)
-      - description (job description)
-      - requirements (list of requirements)
-      - salary (if available)
-      - posted_date (when the job was posted)
-      - application_link (link to apply)
+      - title
+      - company (if found in snippet or URL)
+      - url
+      - snippet (summary from the search result)
       - match_score (how well the candidate matches the job, from 0 to 1)
     agent: JobSearcher
+    output_file: data/relevant_jobs.json
+    context: [analyze_resume]
 
   improve_resume:
     description: >
@@ -64,4 +60,4 @@
       - improved_experience (example of improved experience descriptions)
     agent: ResumeImprover
     context: [analyze_resume, search_jobs]
-    output_file: "data/imporved_resume.md"
+    output_file: "data/improved_resume.json"

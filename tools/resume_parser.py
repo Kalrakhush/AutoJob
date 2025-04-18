@@ -71,11 +71,34 @@ class ResumeParseTool(BaseTool):
     def _extract_information(self, content):
         from services.llm_service import LLMService
         prompt = (
-            "Analyze the following resume and extract all possible details as proper string eith proper line breaks. "
-            "understand the text first of resume , as it can be of any format. Then give proper headers as are in resume and proper details.\n\n"
-            f"{content}\n\n"
-            
-        )
+    "Analyze the following resume and extract all relevant information into structured JSON format. "
+    "PLEASE UNDERSTAND RESUME FIRST AND GIVE ATS SCORE AND MATCH RECOMMENDATIONS VERY CAREFULLY."
+    "Do not hallucinate or fill in missing data. Only extract what is present. "
+    "If any field is not found, leave it empty or omit it.\n\n"
+    "Use this general structure as a guide:\n"
+    "{\n"
+    "  'personal_info': { 'name': '', 'email': '', 'phone': '', 'location': '', 'linkedin': '', 'github': '' },\n"
+    "  'summary': '',\n"
+    "  'skills': { 'languages': [], 'frameworks': [], 'cloud': [], 'tools': [], 'other': [] },\n"
+    "  'experience': [ { 'title': '', 'company': '', 'location': '', 'duration': '', 'responsibilities': [] } ],\n"
+    "  'projects': [ { 'title': '', 'duration': '', 'description': [] } ],\n"
+    "  'education': [ { 'degree': '', 'major': '', 'institution': '', 'year': '', 'cgpa_or_percentage': '' } ],\n"
+    "  'certifications': [ { 'name': '', 'organization': '' } ],\n"
+    "  'publications': [ { 'title': '', 'contributions': [] } ],\n"
+    "  'interpersonal_skills': [],\n"
+    "  'ats_score': 0,\n"
+    "  'match_recommendations': []\n"
+    "}\n\n"
+    "Output only valid JSON, no markdown or commentary.\n\n"
+    f"{content}"
+)
+
         llm = LLMService()
         response = llm.generate_response(prompt)
-        return response
+
+        try:
+            cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", response.strip(), flags=re.DOTALL)
+            return json.loads(cleaned)
+        except json.JSONDecodeError:
+            return {"error": "Invalid JSON from LLM", "raw_response": response}
+

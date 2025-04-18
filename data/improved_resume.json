@@ -1,0 +1,64 @@
+```json
+{
+  "summary": "This resume requires significant improvements to enhance its effectiveness in Applicant Tracking Systems (ATS) and to better showcase the candidate's achievements and skills. Key areas needing attention include quantifiable results in the experience section, a stronger summary statement highlighting key accomplishments, and improved keyword optimization aligned with target job descriptions.  Formatting needs streamlining for better readability and ATS compatibility.",
+  "improvement_areas": [
+    "Quantifiable Results in Experience Section",
+    "Strengthened Summary Statement",
+    "Improved Keyword Optimization",
+    "Streamlined Formatting for ATS Compatibility",
+    "Skills Section Enhancement",
+    "Action Verbs and Concise Language"
+  ],
+  "summary_suggestions": [
+    "Instead of a general overview, focus on a concise and impactful statement highlighting 1-2 key achievements and skills relevant to target roles.  Use strong action verbs and quantify accomplishments whenever possible.",
+    "Tailor the summary to each job application, emphasizing skills and experiences most relevant to the specific role."
+  ],
+  "skills_suggestions": [
+    "Categorize skills into relevant sections (e.g., Technical Skills, Soft Skills, Languages).",
+    "Use a consistent format for listing skills (e.g., bulleted lists).",
+    "Prioritize skills most relevant to target jobs.",
+    "Consider using a skills matrix for a more visually appealing presentation of skills and proficiency levels."
+  ],
+  "experience_suggestions": [
+    "Use the PAR (Problem-Action-Result) method to describe past experiences.  Quantify achievements whenever possible (e.g., 'Increased sales by 15%').",
+    "Focus on accomplishments and contributions, rather than just responsibilities.",
+    "Use action verbs at the beginning of each bullet point (e.g., 'Managed,' 'Developed,' 'Implemented').",
+    "Remove irrelevant or less impactful details. Focus on the most impressive and relevant aspects of each role."
+  ],
+  "education_suggestions": [
+    "List degrees in reverse chronological order.",
+    "Include GPA if above 3.5 or if relevant to the field.",
+    "Add relevant coursework if it strengthens the application.",
+    "Include any honors or awards received."
+  ],
+  "formatting_suggestions": [
+    "Use a clean and professional font (e.g., Calibri, Arial, Times New Roman).",
+    "Maintain consistent formatting throughout the resume.",
+    "Use bullet points and white space to improve readability.",
+    "Keep the resume concise (ideally one page).",
+    "Save as a PDF to preserve formatting."
+  ],
+  "keyword_suggestions": [
+    "To provide specific keyword suggestions, please provide the target job descriptions.  However,  common keywords may include:  'Project Management', 'Data Analysis', 'Communication', 'Teamwork', 'Problem-solving', 'Leadership',  'Software Development' (or specific languages/frameworks), 'Customer Service',  etc.  Tailor these to the specific job descriptions.",
+    "Use a keyword research tool to identify relevant keywords for target jobs."
+  ],
+  "improved_summary": "Highly motivated and results-oriented professional with 5+ years of experience in project management, consistently exceeding expectations in delivering complex projects on time and within budget. Proven ability to lead and mentor teams, fostering a collaborative and productive work environment.  Expertise in [mention specific software or skill] resulting in a 20% increase in efficiency.",
+  "improved_skills": {
+    "Technical Skills": ["Python", "SQL", "Java", "AWS", "Agile Methodologies"],
+    "Soft Skills": ["Communication", "Teamwork", "Problem-solving", "Leadership", "Time Management"],
+    "Languages": ["English (Native)", "Spanish (Conversational)"]
+  },
+  "improved_experience": [
+    {
+      "title": "Project Manager",
+      "company": "Acme Corporation",
+      "dates": "2020-Present",
+      "description": [
+        "Led and managed a cross-functional team of 10 engineers in the development and launch of a new software product, resulting in a 15% increase in user engagement within the first quarter.",
+        "Successfully managed project budgets exceeding $500,000, consistently delivering projects on time and under budget.",
+        "Implemented Agile methodologies, improving team collaboration and reducing project completion time by 20%."
+      ]
+    }
+  ]
+}
+```

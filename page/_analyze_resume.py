@@ -23,5 +23,5 @@ def render_analyze_resume():
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             if st.button("Next: Search for Jobs", type="primary", use_container_width=True):
-                st.session_state["sidebar_navigation"] = "Search Jobs"
+                st.session_state.navigation = "Search Jobs"
                 st.rerun()

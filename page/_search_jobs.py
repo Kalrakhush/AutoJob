@@ -17,7 +17,7 @@ def render_search_jobs():
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             if st.button("Go to Resume Upload", type="primary", use_container_width=True):
-                st.session_state["sidebar_navigation"] = "Analyze Resume"
+                st.session_state.navigation = "Analyze Resume"
                 st.rerun()
         return
     
@@ -33,5 +33,5 @@ def render_search_jobs():
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             if st.button("Next: Improve Your Resume", type="primary", use_container_width=True):
-                st.session_state["sidebar_navigation"] = "Improve Resume"
+                st.session_state.navigation = "Improve Resume"
                 st.rerun()
